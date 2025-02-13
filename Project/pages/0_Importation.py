@@ -88,9 +88,9 @@ def insert_data(connection, df, batch_size=1000):
     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     if 'Nombre_de_visites_par_an' in df.columns:
-st.info("Colonne 'Nombre_de_visites_par_an' trouvée dans l'Excel, valeurs existantes utilisées.")
+        st.info("Colonne 'Nombre_de_visites_par_an' trouvée dans l'Excel, valeurs existantes utilisées.")
     else:
-st.info("Colonne 'Nombre_de_visites_par_an' non trouvée, valeurs par défaut (1) seront utilisées.")
+        st.info("Colonne 'Nombre_de_visites_par_an' non trouvée, valeurs par défaut (1) seront utilisées.")
     client_data = [
         (replace_nan(row['Code client']), replace_nan(row['Code client']), replace_nan(row['Nom Client']), replace_nan(row['Région/Département Client']), replace_nan(row['Code postal Client']), replace_nan(row['Ville Client']), replace_nan(row['Pays Client']), replace_nan(row['Circuit Client']), replace_nan(row['Activité Client']), replace_nan(row['Potentiel Client']), replace_nan(row['Fidélisation Client']), replace_nan(row['CA Client']), replace_nan(row['Couche']), replace_nan(row['RegleProd Client']), replace_nan(row['Nombre_de_visites_par_an']) if 'Nombre_de_visites_par_an' in df.columns and pd.notna(row['Nombre_de_visites_par_an']) else 1)
         for _, row in df.iterrows()
@@ -98,7 +98,7 @@ st.info("Colonne 'Nombre_de_visites_par_an' non trouvée, valeurs par défaut (1
     ]
     for i in range(0, len(client_data), batch_size):
         cursor.executemany(client_query, client_data[i:i + batch_size])
-    st.success(f"{len(client_data)} nouveaux clients insérés.")
+        st.success(f"{len(client_data)} nouveaux clients insérés.")
  
     # Insertion des visites
     existing_visites = get_existing_ids(connection, 'visite', 'ID_Visite')
@@ -113,7 +113,7 @@ st.info("Colonne 'Nombre_de_visites_par_an' non trouvée, valeurs par défaut (1
     ]
     for i in range(0, len(visite_data), batch_size):
         cursor.executemany(visite_query, visite_data[i:i + batch_size])
-    st.success(f"{len(visite_data)} nouvelles visites insérées.")
+        st.success(f"{len(visite_data)} nouvelles visites insérées.")
  
     connection.commit()
     cursor.close()
