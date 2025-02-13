@@ -25,7 +25,7 @@ def create_connection():
             port=DB_PORT,
             database=DB_NAME
         )
-        mycursor = mydb.cursor()
+        mycursor = connection.cursor()
         st.success("✅ Connexion à la base de données réussie!")
     except pymysql.MySQLError as err:
         st.error(f"❌ Erreur de connexion : {err}")
