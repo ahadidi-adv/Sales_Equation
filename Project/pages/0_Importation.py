@@ -18,7 +18,7 @@ def create_connection():
 
     # Connexion à la base de données
     try:
-        mydb = pymysql.connect(
+        connection = pymysql.connect(
             host=DB_HOST,
             user=DB_USER,
             password=DB_PASSWORD,
