@@ -213,14 +213,20 @@ def main():
             
             if st.button("Importer les données"):
                 connection = create_connection()
-                if connection is not None:
-                    clear_all_data(connection)
+                if connection:
+                    st.success("🔄 Connexion obtenue, début du traitement...")
                     
-                    insert_data(connection, df)
-                    st.success("Processus d'importation terminé!")
-                    connection.close()
+                    try:
+                        clear_all_data(connection)
+                        insert_data(connection, df)
+                        st.success("✅ Processus d'importation terminé avec succès!")
+                    except Exception as e:
+                        st.error(f"❌ Erreur lors de l'importation des données: {e}")
+                    finally:
+                        connection.close()  # Toujours fermer la connexion
+                        st.info("🔌 Connexion fermée.")
                 else:
-                    st.error("Impossible de se connecter à la base de données.")
+                    st.error("❌ Impossible de se connecter à la base de données.")
 
 if __name__ == "__main__":
     main()
