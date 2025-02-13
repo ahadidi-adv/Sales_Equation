@@ -98,7 +98,7 @@ def insert_data(connection, df, batch_size=1000):
     ]
     for i in range(0, len(client_data), batch_size):
         cursor.executemany(client_query, client_data[i:i + batch_size])
-        st.success(f"{len(client_data)} nouveaux clients insérés.")
+    st.success(f"{len(client_data)} nouveaux clients insérés.")
  
     # Insertion des visites
     existing_visites = get_existing_ids(connection, 'visite', 'ID_Visite')
@@ -113,7 +113,7 @@ def insert_data(connection, df, batch_size=1000):
     ]
     for i in range(0, len(visite_data), batch_size):
         cursor.executemany(visite_query, visite_data[i:i + batch_size])
-        st.success(f"{len(visite_data)} nouvelles visites insérées.")
+    st.success(f"{len(visite_data)} nouvelles visites insérées.")
  
     connection.commit()
     cursor.close()
