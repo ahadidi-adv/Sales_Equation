@@ -6,28 +6,35 @@ import io
 # Set page layout to wide
 st.set_page_config(layout="wide")
 
+# Database connection settings
+DB_HOST = "bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com"
+DB_USER = "usbidjmhwyxcuar4"
+DB_PASSWORD = "tQemqKFD6orQ1DLz4Xrl"
+DB_PORT = 3306
+DB_NAME = "bjjvcnkquh3rdkwnqviv"
+
 # Establish a connection to MySQL Server
 try:
     mydb = pymysql.connect(
-        host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
-            user='usbidjmhwyxcuar4',
-            password='tQemqKFD6orQ1DLz4Xrl',
-            port=3306,
-            database='bjjvcnkquh3rdkwnqviv'
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        port=DB_PORT,
+        database=DB_NAME
     )
-    mycursor = mydb.cursor(buffered=True)
-    st.success("Connection Established")
+    mycursor = mydb.cursor()
+    st.success("✅ Connection Established")
 
-    # Requête pour obtenir tous les commerciaux
+    # Fetch all distinct commercial names
     mycursor.execute("SELECT DISTINCT Nom_Commercial FROM commercial")
     all_commercials = mycursor.fetchall()
     commercial_list = [i[0] for i in all_commercials]
 
-    # Widget multiselect pour choisir les commerciaux
+    # Multiselect widget for choosing commercials
     selected_commercials = st.multiselect('Choisir les commerciaux', commercial_list)
 
-    # Requête SQL pour récupérer les données en fonction des commerciaux sélectionnés
-    query = f"""
+    # SQL query to fetch data based on selected commercials
+    query = """
     SELECT 
         com.Nom_Commercial, 
         com.`Solde_visite_terrain_client_par_an(Possibles)`, 
@@ -50,6 +57,7 @@ try:
     JOIN visite vis ON com.Id_Commercial = vis.Id_Commercial
     JOIN client cli ON vis.ID_Client = cli.ID_Client
     """
+
     if selected_commercials:
         commercial_placeholders = ', '.join(['%s'] * len(selected_commercials))
         query += f" WHERE com.Nom_Commercial IN ({commercial_placeholders})"
@@ -58,29 +66,37 @@ try:
         mycursor.execute(query)
 
     result = mycursor.fetchall()
-    
-    # Convertir les résultats en DataFrame
+
+    # Convert query results to a Pandas DataFrame
     df = pd.DataFrame(result, columns=[
         'Nom_Commercial', 'Solde_visite_terrain_client_par_an(Possibles)',
         'Solde_visite_terrain_prospects_par_an(Possibles)', 'Nom_Client',
         'Nombre_de_visites_par_an', 'Code_Client', 'Region_Client',
         'Code_Postal', 'Ville_Client', 'Pays_Client', 'Circuit_Client',
         'Activite_Client', 'Potentiel_Client', 'Fidelisation_Client',
-        'CA_k_Client', 'Couche', 'Regle_Prod'
+        'CA_Client', 'Couche', 'Regle_Prod'
     ])
-    
-    # Affichage du DataFrame
+
+    # Display DataFrame
     st.write(df)
 
-    # Bouton pour exporter en Excel
+    # Create Excel output for download
     output = io.BytesIO()
-    xlsx_data = df.to_excel(output, index=False)
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name="Data")
+        writer.close()
+
+    # Download button for Excel file
     st.download_button(
-        label="Télécharger le fichier Excel",
+        label="📥 Télécharger le fichier Excel",
         data=output.getvalue(),
-        file_name="Output outil calibrage.xlsx",
-        mime="application/vnd.ms-excel"
+        file_name="Output_calibrage.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-except pymysql.Error as e:
-    st.error(f"Error connecting to MySQL Server: {e}")
+except pymysql.MySQLError as e:
+    st.error(f"❌ Error connecting to MySQL Server: {e}")
+
+finally:
+    if 'mydb' in locals() and mydb.open:
+        mydb.close()

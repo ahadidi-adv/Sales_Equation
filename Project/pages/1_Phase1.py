@@ -6,6 +6,7 @@ import streamlit_shadcn_ui as ui
 import plost
 import matplotlib.pyplot as plt 
 import time
+import os
 
 # Set up the layout
 st.set_page_config(layout="wide")
@@ -14,20 +15,27 @@ st.set_page_config(layout="wide")
 #logo
 st.logo("Africa.png", icon_image="Logo.png")
 
-# Establish a connection to MySQL Server
+# Using environment variables for security (set these in deployment)
+DB_HOST = os.getenv("DB_HOST", "bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com")
+DB_USER = os.getenv("DB_USER", "usbidjmhwyxcuar4")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "tQemqKFD6orQ1DLz4Xrl")
+DB_PORT = int(os.getenv("DB_PORT", 3306))
+DB_NAME = os.getenv("DB_NAME", "bjjvcnkquh3rdkwnqviv")
+
+# Connexion à la base de données
 try:
     mydb = pymysql.connect(
-    host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
-            user='usbidjmhwyxcuar4',
-            password='tQemqKFD6orQ1DLz4Xrl',
-            port=3306,
-            database='bjjvcnkquh3rdkwnqviv'
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        port=DB_PORT,
+        database=DB_NAME
     )
-    #Create a cursor object
     mycursor = mydb.cursor()
-    print("Connection Established")
-except:
-    st.error("cONNECTION ERROR")
+    st.success("✅ Connexion à la base de données réussie!")
+except pymysql.MySQLError as err:
+    st.error(f"❌ Erreur de connexion : {err}")
+    
 
 
 

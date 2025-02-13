@@ -9,6 +9,7 @@ Dans SQL de ctte partie j'ai ajouter 3 triggers qui fait un update automatique d
 import streamlit as st
 import pymysql
 import pandas as pd
+import os
 
 # Configuration de la page Streamlit
 st.set_page_config(layout="wide")
@@ -16,19 +17,27 @@ st.title("Gestion des Visites Clients (Nécessaires)")
 st.logo("Africa.png", icon_image="Logo.png")
 
 
-# Tentative de connexion à la base de données MySQL
+# Using environment variables for security (set these in deployment)
+DB_HOST = os.getenv("DB_HOST", "bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com")
+DB_USER = os.getenv("DB_USER", "usbidjmhwyxcuar4")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "tQemqKFD6orQ1DLz4Xrl")
+DB_PORT = int(os.getenv("DB_PORT", 3306))
+DB_NAME = os.getenv("DB_NAME", "bjjvcnkquh3rdkwnqviv")
+
+# Connexion à la base de données
 try:
     mydb = pymysql.connect(
-        host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
-            user='usbidjmhwyxcuar4',
-            password='tQemqKFD6orQ1DLz4Xrl',
-            port=3306,
-            database='bjjvcnkquh3rdkwnqviv'
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        port=DB_PORT,
+        database=DB_NAME
     )
     mycursor = mydb.cursor()
-except pymysql.Error as err:
-    st.error(f"Erreur de connexion : {err}")
-
+    st.success("✅ Connexion à la base de données réussie!")
+except pymysql.MySQLError as err:
+    st.error(f"❌ Erreur de connexion : {err}")
+    
 
 
 

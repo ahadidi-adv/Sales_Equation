@@ -5,23 +5,33 @@ from streamlit_option_menu import option_menu
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn
+import os
 
 # Configuration de la page
 st.set_page_config(layout="wide")
 st.logo("Africa.png", icon_image="Logo.png")
 
+# Using environment variables for security (set these in deployment)
+DB_HOST = os.getenv("DB_HOST", "bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com")
+DB_USER = os.getenv("DB_USER", "usbidjmhwyxcuar4")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "tQemqKFD6orQ1DLz4Xrl")
+DB_PORT = int(os.getenv("DB_PORT", 3306))
+DB_NAME = os.getenv("DB_NAME", "bjjvcnkquh3rdkwnqviv")
+
 # Connexion à la base de données
 try:
     mydb = pymysql.connect(
-        host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
-            user='usbidjmhwyxcuar4',
-            password='tQemqKFD6orQ1DLz4Xrl',
-            port=3306,
-            database='bjjvcnkquh3rdkwnqviv'
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        port=DB_PORT,
+        database=DB_NAME
     )
-    mycursor = mydb.cursor(buffered=True)
-except pymysql.Error as e:
-    st.error(f"Erreur de connexion à la base de données: {e}")
+    mycursor = mydb.cursor()
+    st.success("✅ Connexion à la base de données réussie!")
+except pymysql.MySQLError as err:
+    st.error(f"❌ Erreur de connexion : {err}")
+    
 
 navbar=st.container()
 

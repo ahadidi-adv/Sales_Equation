@@ -3,27 +3,34 @@ import pandas as pd
 import pymysql
 from pymysql import Error
 import io
+import os
+
 st.set_page_config(page_title="Importation", page_icon="🔗")
 st.logo("Africa.png", icon_image="Logo.png")
 
 def create_connection():
-    """Create a database connection to a MySQL database."""
-    connection = None
+    # Using environment variables for security (set these in deployment)
+    DB_HOST = os.getenv("DB_HOST", "bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com")
+    DB_USER = os.getenv("DB_USER", "usbidjmhwyxcuar4")
+    DB_PASSWORD = os.getenv("DB_PASSWORD", "tQemqKFD6orQ1DLz4Xrl")
+    DB_PORT = int(os.getenv("DB_PORT", 3306))
+    DB_NAME = os.getenv("DB_NAME", "bjjvcnkquh3rdkwnqviv")
+
+    # Connexion à la base de données
     try:
-        connection = pymysql.connect(
-            host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
-            user='usbidjmhwyxcuar4',
-            password='tQemqKFD6orQ1DLz4Xrl',
-            port=3306,
-            database='bjjvcnkquh3rdkwnqviv',
-            #connection_timeout=600,  # Timeout de 10 minutes
-            #autocommit=True          # Active la reconnexion automatique
+        mydb = pymysql.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            port=DB_PORT,
+            database=DB_NAME
         )
-        if connection.is_connected():
-            st.success("Connected to the database")
-    except Error as e:
-        st.error(f"The error '{e}' occurred")
-    return connection
+        mycursor = mydb.cursor()
+        st.success("✅ Connexion à la base de données réussie!")
+    except pymysql.MySQLError as err:
+        st.error(f"❌ Erreur de connexion : {err}")
+        
+
 
 def get_existing_ids(connection, table_name, id_column):
     cursor = connection.cursor()

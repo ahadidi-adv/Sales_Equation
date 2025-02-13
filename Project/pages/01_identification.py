@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import pymysql
- 
+import os
  
 # Configuration de la page
 st.set_page_config(page_title="Dashboard Global", layout="wide", page_icon="📊")
@@ -42,20 +42,28 @@ st.markdown("""
 """, unsafe_allow_html=True)
  
  
- 
+# Using environment variables for security (set these in deployment)
+DB_HOST = os.getenv("DB_HOST", "bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com")
+DB_USER = os.getenv("DB_USER", "usbidjmhwyxcuar4")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "tQemqKFD6orQ1DLz4Xrl")
+DB_PORT = int(os.getenv("DB_PORT", 3306))
+DB_NAME = os.getenv("DB_NAME", "bjjvcnkquh3rdkwnqviv")
+
 # Connexion à la base de données
 try:
     mydb = pymysql.connect(
-        host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
-            user='usbidjmhwyxcuar4',
-            password='tQemqKFD6orQ1DLz4Xrl',
-            port=3306,
-            database='bjjvcnkquh3rdkwnqviv'
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        port=DB_PORT,
+        database=DB_NAME
     )
-    mycursor = mydb.cursor(buffered=True)
-    st.success("Connexion à la base de données réussie!")
-except pymysql.Error as err:
-    st.error(f"Erreur : {err}")
+    mycursor = mydb.cursor()
+    st.success("✅ Connexion à la base de données réussie!")
+except pymysql.MySQLError as err:
+    st.error(f"❌ Erreur de connexion : {err}")
+    
+
 database="calibrage120"
 # --- Cartes globales ---
 st.markdown("<div class='title'>📊 Tableau de bord - Vue Globale</div>", unsafe_allow_html=True)
@@ -127,7 +135,7 @@ def fetch_integrated_data():
     return pd.DataFrame(data, columns=columns)
  
 # Load and display the integrated data
-if mydb.is_connected():
+if mydb and mydb.open:
     st.header("Integrated Global Data View")
     df = fetch_integrated_data()
     st.dataframe(df)
