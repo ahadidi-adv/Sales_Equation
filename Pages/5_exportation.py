@@ -1,5 +1,5 @@
 import streamlit as st
-import mysql.connector
+import pymysql
 import pandas as pd
 import io
 
@@ -8,7 +8,7 @@ st.set_page_config(layout="wide")
 
 # Establish a connection to MySQL Server
 try:
-    mydb = mysql.connector.connect(
+    mydb = pymysql.connect(
         host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
             user='usbidjmhwyxcuar4',
             password='tQemqKFD6orQ1DLz4Xrl',
@@ -82,5 +82,5 @@ try:
         mime="application/vnd.ms-excel"
     )
 
-except mysql.connector.Error as e:
+except pymysql.Error as e:
     st.error(f"Error connecting to MySQL Server: {e}")

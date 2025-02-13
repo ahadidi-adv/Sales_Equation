@@ -1,5 +1,5 @@
 import streamlit as st
-import mysql.connector
+import pymysql
 import pandas as pd
 from streamlit_option_menu import option_menu
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ st.logo("Africa.png", icon_image="Logo.png")
 
 # Tentative de connexion à la base de données MySQL
 try:
-    mydb = mysql.connector.connect(
+    mydb = pymysql.connect(
         host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
             user='usbidjmhwyxcuar4',
             password='tQemqKFD6orQ1DLz4Xrl',
@@ -19,7 +19,7 @@ try:
             database='bjjvcnkquh3rdkwnqviv'
     )
     mycursor = mydb.cursor()
-except mysql.connector.Error as err:
+except pymysql.Error as err:
     st.error(f"Erreur de connexion : {err}")
 
 

@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import mysql.connector
+import pymysql
  
  
 # Configuration de la page
@@ -45,7 +45,7 @@ st.markdown("""
  
 # Connexion à la base de données
 try:
-    mydb = mysql.connector.connect(
+    mydb = pymysql.connect(
         host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
             user='usbidjmhwyxcuar4',
             password='tQemqKFD6orQ1DLz4Xrl',
@@ -54,7 +54,7 @@ try:
     )
     mycursor = mydb.cursor(buffered=True)
     st.success("Connexion à la base de données réussie!")
-except mysql.connector.Error as err:
+except pymysql.Error as err:
     st.error(f"Erreur : {err}")
 database="calibrage120"
 # --- Cartes globales ---

@@ -1,5 +1,5 @@
 import streamlit as st
-import mysql.connector
+import pymysql
 import pandas as pd
 from streamlit_option_menu import option_menu
 import streamlit_shadcn_ui as ui
@@ -16,7 +16,7 @@ st.logo("Africa.png", icon_image="Logo.png")
 
 # Establish a connection to MySQL Server
 try:
-    mydb = mysql.connector.connect(
+    mydb = pymysql.connect(
     host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
             user='usbidjmhwyxcuar4',
             password='tQemqKFD6orQ1DLz4Xrl',
@@ -472,7 +472,7 @@ with navbar:
                     st.success(f"Data successfully updated in both tables for {mycursor.rowcount} commercial records!")
                 else:
                     st.warning("No changes were made. The data provided might be the same as existing data.")
-            except mysql.connector.Error as e:
+            except pymysql.Error as e:
                 st.error(f"Failed to update data due to a database error: {e}")
             except Exception as e:
                 st.error(f"An unexpected error occurred: {e}")

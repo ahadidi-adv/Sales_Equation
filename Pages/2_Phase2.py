@@ -7,7 +7,7 @@ Dans SQL de ctte partie j'ai ajouter 3 triggers qui fait un update automatique d
 """
 
 import streamlit as st
-import mysql.connector
+import pymysql
 import pandas as pd
 
 # Configuration de la page Streamlit
@@ -18,7 +18,7 @@ st.logo("Africa.png", icon_image="Logo.png")
 
 # Tentative de connexion à la base de données MySQL
 try:
-    mydb = mysql.connector.connect(
+    mydb = pymysql.connect(
         host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
             user='usbidjmhwyxcuar4',
             password='tQemqKFD6orQ1DLz4Xrl',
@@ -26,7 +26,7 @@ try:
             database='bjjvcnkquh3rdkwnqviv'
     )
     mycursor = mydb.cursor()
-except mysql.connector.Error as err:
+except pymysql.Error as err:
     st.error(f"Erreur de connexion : {err}")
 
 

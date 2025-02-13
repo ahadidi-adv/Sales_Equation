@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
-import mysql.connector
-from mysql.connector import Error
+import pymysql
+from pymysql import Error
 import io
 st.set_page_config(page_title="Importation", page_icon="🔗")
 st.logo("Africa.png", icon_image="Logo.png")
@@ -10,7 +10,7 @@ def create_connection():
     """Create a database connection to a MySQL database."""
     connection = None
     try:
-        connection = mysql.connector.connect(
+        connection = pymysql.connect(
             host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
             user='usbidjmhwyxcuar4',
             password='tQemqKFD6orQ1DLz4Xrl',
