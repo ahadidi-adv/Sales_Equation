@@ -1,5 +1,10 @@
 import streamlit as st
-
+from streamlit.components.v1 import html
+    html('''
+       <script>
+        window.top.document.querySelectorAll(`[href*="streamlit.io"]`).forEach(e => e.setAttribute("style", "display: none;"));
+      </script>
+    ''')
 
 st.set_page_config(
     page_title="Hello",
