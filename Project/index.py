@@ -1,15 +1,16 @@
 import streamlit as st
 from streamlit.components.v1 import html
+
+st.set_page_config(
+    page_title="Hello",
+    page_icon="👋",
+)
 html('''
        <script>
         window.top.document.querySelectorAll(`[href*="streamlit.io"]`).forEach(e => e.setAttribute("style", "display: none;"));
       </script>
     ''')
 
-st.set_page_config(
-    page_title="Hello",
-    page_icon="👋",
-)
 hide_streamlit_style = """
             <style>
             [data-testid="stToolbar"] {visibility: hidden !important;}
