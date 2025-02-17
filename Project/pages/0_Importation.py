@@ -12,15 +12,15 @@ def create_connection():
     connection = None
     try:
         connection = pymysql.connect(
-host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
-            user='usbidjmhwyxcuar4',
-            password='tQemqKFD6orQ1DLz4Xrl',
+            host='DataAdventAfrica.mysql.pythonanywhere-services.com',
+            user='DataAdventAfrica',
+            password='advent2025admin',
             port=3306,
-            database='bjjvcnkquh3rdkwnqviv',
-            connect_timeout=600,  # Timeout de 10 minutes
-            autocommit=True  # Active la reconnexion automatique
+            database='DataAdventAfrica$scorecard',
+            #connection_timeout=600,  # Timeout de 10 minutes
+            #autocommit=True          # Active la reconnexion automatique
         )
-        if connection.open:
+        if connection.is_connected():
             st.success("Connected to the database")
     except Error as e:
         st.error(f"The error '{e}' occurred")
