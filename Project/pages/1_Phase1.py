@@ -7,63 +7,27 @@ import plost
 import matplotlib.pyplot as plt 
 import time
 import os
- 
-import sshtunnel
-import pymysql
-from pymysql import Error
-import MySQLdb
-
 # Set up the layout
 st.set_page_config(layout="wide")
-hide_streamlit_style = """
-            <style>
-            [data-testid="stToolbar"] {visibility: hidden !important;}
-            footer {visibility: hidden !important;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 
 #logo
 st.logo("Africa.png", icon_image="Logo.png")
 
-# ✅ Function to create SSH tunnel and connect to MySQL
-def create_ssh_tunnel():
-    """Creates an SSH tunnel and connects to MySQL."""
-    try:
-        sshtunnel.SSH_TIMEOUT = 15.0
-        sshtunnel.TUNNEL_TIMEOUT = 15.0
-
-        tunnel = sshtunnel.SSHTunnelForwarder(
-            ('ssh.pythonanywhere.com'),
-            ssh_username='DataAdventAfrica',
-            ssh_password='DataAdventPlusAfrica2025.',
-            remote_bind_address=('DataAdventAfrica.mysql.pythonanywhere-services.com', 3306)
-        )
-
-        tunnel.start()
-
-        mydb = MySQLdb.connect(
-            user='DataAdventAfrica',
-            passwd='advent2025admin',
-            host='127.0.0.1',  # ✅ Localhost because of SSH tunneling
-            port=tunnel.local_bind_port,  # ✅ Port forwarded through SSH
-            db='DataAdventAfrica$calibrage120',
-        )
-
-        print("✅ Connected to MySQL successfully!")
-        return mydb, tunnel  # ✅ Now properly inside a function
-
-    except Exception as e:
-        print(f"❌ mydb Error: {e}")
-        return None, None  # ✅ Now properly inside a function
-
-# ✅ Connect to MySQL via SSH Tunnel
-mydb, tunnel = create_ssh_tunnel()
-if mydb:
+# Establish a connection to MySQL Server
+try:
+    mydb = pymysql.connect(
+    host='bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com',
+            user='usbidjmhwyxcuar4',
+            password='tQemqKFD6orQ1DLz4Xrl',
+            port=3306,
+            database='bjjvcnkquh3rdkwnqviv'
+    )
+    #Create a cursor object
     mycursor = mydb.cursor()
-else:
-    st.error("🚨 mydb to MySQL failed! Please check credentials and SSH tunnel.")
-
+    print("Connection Established")
+except:
+    st.error("cONNECTION ERROR")
 
 
 
@@ -659,13 +623,3 @@ with navbar:
                 st.session_state.button_modifier_state = False
                 st.rerun()
                 
-# ✅ Close SSH Tunnel
-def close_mydbs():
-    if mydb:
-        mydb.close()
-    if tunnel:
-        tunnel.close()
-    print("🔴 MySQL and SSH Tunnel Closed.")
-
-import atexit
-atexit.register(close_mydbs)
