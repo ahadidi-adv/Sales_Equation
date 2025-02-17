@@ -3,35 +3,46 @@ import pandas as pd
 import pymysql
 from pymysql import Error
 import io
- 
+  
+import sshtunnel
+import pymysql
+from pymysql import Error
+import MySQLdb
+
 st.set_page_config(page_title="Importation", page_icon="🔗")
 st.logo("Africa.png", icon_image="Logo.png")
-hide_streamlit_style = """
-            <style>
-            [data-testid="stToolbar"] {visibility: hidden !important;}
-            footer {visibility: hidden !important;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 
 def create_connection():
-    """Create a database connection to a MySQL database."""
-    connection = None
+    """Create a database connection to a MySQL database using an SSH tunnel."""
     try:
-        connection = pymysql.connect(
-            host='DataAdventAfrica.mysql.pythonanywhere-services.com',
-            user='DataAdventAfrica',
-            password='advent2025admin',
-            port=3306,
-            database='DataAdventAfrica$scorecard',
-            #connection_timeout=600,  # Timeout de 10 minutes
-            #autocommit=True          # Active la reconnexion automatique
+        sshtunnel.SSH_TIMEOUT = 15.0
+        sshtunnel.TUNNEL_TIMEOUT = 15.0
+
+        tunnel = sshtunnel.SSHTunnelForwarder(
+            ('ssh.pythonanywhere.com'),  # PythonAnywhere SSH hostname
+            ssh_username='DataAdventAfrica',  # Your PythonAnywhere username
+            ssh_password='DataAdventPlusAfrica2025.',  # Your PythonAnywhere password
+            remote_bind_address=('DataAdventAfrica.mysql.pythonanywhere-services.com', 3306)
         )
-        if connection.is_connected():
-            st.success("Connected to the database")
-    except Error as e:
-        st.error(f"The error '{e}' occurred")
-    return connection
+
+        tunnel.start()
+
+        connection = MySQLdb.connect(
+            user='DataAdventAfrica',
+            passwd='advent2025admin',
+            host='127.0.0.1',  # Localhost because of SSH tunneling
+            port=tunnel.local_bind_port,  # Port forwarded through SSH
+            db='DataAdventAfrica$calibrage120',
+        )
+
+        print("Connected to MySQL successfully!")
+        return connection, tunnel  # Return both the connection and tunnel
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return None, None
+
  
 def get_existing_ids(connection, table_name, id_column):
     cursor = connection.cursor()

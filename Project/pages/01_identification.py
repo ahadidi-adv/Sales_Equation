@@ -1,8 +1,10 @@
 import streamlit as st
 import pandas as pd
 import pymysql
+import sshtunnel
+import MySQLdb
 import os
- 
+
 # Configuration de la page
 st.set_page_config(page_title="Dashboard Global", layout="wide", page_icon="📊")
 st.logo("Africa.png", icon_image="Logo.png")
@@ -48,27 +50,44 @@ st.markdown("""
 """, unsafe_allow_html=True)
  
  
-# Using environment variables for security (set these in deployment)
-DB_HOST = os.getenv("DB_HOST", "bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com")
-DB_USER = os.getenv("DB_USER", "usbidjmhwyxcuar4")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "tQemqKFD6orQ1DLz4Xrl")
-DB_PORT = int(os.getenv("DB_PORT", 3306))
-DB_NAME = os.getenv("DB_NAME", "bjjvcnkquh3rdkwnqviv")
+# ✅ Function to create SSH tunnel and connect to MySQL
+#Create a database connection to a MySQL database using an SSH tunnel.
+def create_ssh_tunnel():
+    """Creates an SSH tunnel to connect securely to MySQL on PythonAnywhere."""
+    try:
+        sshtunnel.SSH_TIMEOUT = 15.0
+        sshtunnel.TUNNEL_TIMEOUT = 15.0
 
-# Connexion à la base de données
-try:
-    mydb = pymysql.connect(
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        port=DB_PORT,
-        database=DB_NAME
-    )
-    mycursor = mydb.cursor()
-    st.success("✅ Connexion à la base de données réussie!")
-except pymysql.MySQLError as err:
-    st.error(f"❌ Erreur de connexion : {err}")
-    
+        tunnel = sshtunnel.SSHTunnelForwarder(
+            ('ssh.pythonanywhere.com'),
+            ssh_username='DataAdventAfrica',
+            ssh_password='DataAdventPlusAfrica2025.',
+            remote_bind_address=('DataAdventAfrica.mysql.pythonanywhere-services.com', 3306)
+        )
+
+        tunnel.start()
+
+        connection = MySQLdb.connect(
+            user='DataAdventAfrica',
+            passwd='advent2025admin',
+            host='127.0.0.1',  # ✅ Localhost because of SSH tunneling
+            port=tunnel.local_bind_port,  # ✅ Port forwarded through SSH
+            db='DataAdventAfrica$calibrage120',
+        )
+
+        print("✅ Connected to MySQL successfully!")
+        return connection, tunnel  # ✅ Now properly inside a function
+
+    except Exception as e:
+        print(f"❌ Connection Error: {e}")
+        return None, None  # ✅ Now properly inside a function
+
+# ✅ Connect to MySQL via SSH Tunnel
+connection, tunnel = create_ssh_tunnel()
+if connection:
+    mycursor = connection.cursor()
+else:
+    st.error("🚨 Connection to MySQL failed! Please check credentials and SSH tunnel.")
 
 database="calibrage120"
 # --- Cartes globales ---
@@ -141,7 +160,7 @@ def fetch_integrated_data():
     return pd.DataFrame(data, columns=columns)
  
 # Load and display the integrated data
-if mydb and mydb.open:
+if connection:
     st.header("Integrated Global Data View")
     df = fetch_integrated_data()
     st.dataframe(df)
@@ -261,3 +280,17 @@ df_pays["Chiffre_d_Affaires"] = df_pays["Chiffre_d_Affaires"].apply(lambda x: f"
  
 st.subheader("Distribution des Clients / Commerciaux / Chiffre d'affaires par Pays")
 st.dataframe(df_pays)
+
+
+# ✅ Closing SSH Tunnel on App Exit
+def close_connections():
+    """Closes MySQL and SSH tunnel connections."""
+    if connection:
+        connection.close()
+    if tunnel:
+        tunnel.close()
+    print("🔴 MySQL and SSH Tunnel Closed.")
+
+# ✅ Ensure connections are closed when Streamlit stops
+import atexit
+atexit.register(close_connections)
