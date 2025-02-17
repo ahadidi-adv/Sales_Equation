@@ -9,6 +9,13 @@ import os
 # Configuration de la page Streamlit
 st.set_page_config(layout="wide")
 st.logo("Africa.png", icon_image="Logo.png")
+hide_streamlit_style = """
+            <style>
+            [data-testid="stToolbar"] {visibility: hidden !important;}
+            footer {visibility: hidden !important;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # Using environment variables for security (set these in deployment)
 DB_HOST = os.getenv("DB_HOST", "bjjvcnkquh3rdkwnqviv-mysql.services.clever-cloud.com")

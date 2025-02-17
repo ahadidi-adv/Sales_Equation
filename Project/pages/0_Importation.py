@@ -6,7 +6,14 @@ import io
  
 st.set_page_config(page_title="Importation", page_icon="🔗")
 st.logo("Africa.png", icon_image="Logo.png")
- 
+hide_streamlit_style = """
+            <style>
+            [data-testid="stToolbar"] {visibility: hidden !important;}
+            footer {visibility: hidden !important;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 def create_connection():
     """Create a database connection to a MySQL database."""
     connection = None
